@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bookmark Library — a bookmark library worth revisiting</title>
+<meta name="description" content="Turn a neglected Chrome bookmark export into a searchable, sortable reading library, then decide what to keep. Private by default." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231c1a17%22/><path d=%22M10 8h12v17l-6-4-6 4V8z%22 fill=%22%23e3bd7d%22/></svg>" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div class="spec-banner">
+  <strong>Specification stage</strong> — this site demos the product spec (Gen 2). Thresholds, pricing and the Google-sync flow below are hypotheses to validate, not commitments. <a href="#faq">Read the honesty notes</a>.
+</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4V3z" fill="#e3bd7d"/></svg>
+      </span>
+      Bookmark Library
+    </a>
+    <nav class="nav-links">
+      <a href="#product">Product</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#sync">Accounts &amp; sync</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="demo.html" class="btn btn-primary btn-sm">Try the demo</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">Product spec · Build brief</div>
+        <h1>A bookmark library worth revisiting</h1>
+        <p class="hero-sub">
+          Chrome's folders preserve where you saved a link, not why it mattered. This turns
+          hundreds or thousands of forgotten bookmarks into a searchable, topic-grouped library —
+          then helps you decide, item by item, what to keep, read later, or let go.
+        </p>
+        <div class="hero-ctas">
+          <a href="demo.html" class="btn btn-accent">Try the demo library</a>
+          <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
+        </div>
+        <div class="hero-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Private by default — nothing is deleted from Chrome, and nothing is shared unless you choose to.
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="mock-window">
+          <div class="mock-titlebar">
+            <span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span>
+            <span>library.app/bookmarks</span>
+          </div>
+          <div class="mock-body">
+            <div class="mock-searchbar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              Search 2,412 bookmarks…
+            </div>
+            <div class="mock-chip-row">
+              <span class="mock-chip">AI agents · 84</span>
+              <span class="mock-chip alt">Article</span>
+              <span class="mock-chip alt">Unreviewed</span>
+            </div>
+
+            <div class="mock-item">
+              <div class="mock-favicon" style="background:#a8721f;">A</div>
+              <div class="mock-item-body">
+                <div class="mock-item-title">Context windows and the case for cheap memory</div>
+                <div class="mock-item-meta">arxiv.org · Research/Papers/2025 · Article</div>
+                <div class="mock-item-summary">Argues that retrieval cost, not context length, is the binding constraint.</div>
+              </div>
+              <span class="mock-tag fresh">Recent</span>
+            </div>
+            <div class="mock-item">
+              <div class="mock-favicon" style="background:#3a5f7a;">P</div>
+              <div class="mock-item-body">
+                <div class="mock-item-title">Series A pricing trends, Q1 2024 review</div>
+                <div class="mock-item-meta">substack.com · New folder (3)/Reading · Article</div>
+                <div class="mock-item-summary">Quarterly pricing data now two years stale — figures likely superseded.</div>
+              </div>
+              <span class="mock-tag old">Likely old news</span>
+            </div>
+            <div class="mock-item">
+              <div class="mock-favicon" style="background:#6b6558;">D</div>
+              <div class="mock-item-body">
+                <div class="mock-item-title">docs — cluster autoscaling reference</div>
+                <div class="mock-item-meta">internal-wiki.dev · Docs · Document/PDF</div>
+                <div class="mock-item-summary">Could not verify freshness — no publication date detected.</div>
+              </div>
+              <span class="mock-tag unknown">Evergreen/unknown</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="product" class="alt-bg">
+    <div class="container">
+      <div class="section-head center">
+        <div class="eyebrow" style="justify-content:center">The problem</div>
+        <h2>Saved is not the same as findable</h2>
+        <p>A knowledge worker, founder, investor or researcher with hundreds to thousands of saved
+        URLs and little folder hygiene can't find a useful piece, tell a paper from a podcast, or see
+        which news has expired — without opening every link.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="num">01</div>
+          <h3>No sense of why</h3>
+          <p>"New folder (3)" tells you nothing about relevance, format, or whether the page still says what it said when you saved it.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">02</div>
+          <h3>No sense of what's stale</h3>
+          <p>A pricing analysis from two years ago and a reference doc from five years ago look identical in a folder view.</p>
+        </div>
+        <div class="problem-card">
+          <div class="num">03</div>
+          <h3>No path to a decision</h3>
+          <p>This is a personal library and triage tool, not a social bookmarking feed — the point is a deliberate keep, read-later, or delete call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="container-narrow">
+      <div class="section-head">
+        <div class="eyebrow">First-run journey</div>
+        <h2>From export to a reviewed library</h2>
+        <p>Five steps, and the owner is never more than one undo away from any decision.</p>
+      </div>
+      <div class="journey">
+        <div class="journey-step">
+          <div class="journey-num">01</div>
+          <div>
+            <h3>See the output before you sign up</h3>
+            <p>The landing page explains the output and privacy in one screen. Try a small demo library before creating an account.</p>
+          </div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">02</div>
+          <div>
+            <h3>Sign in with Google, then import honestly</h3>
+            <p>You land in a private account and choose one of two routes: upload a Chrome bookmark-manager HTML export now, or install the companion Chrome extension for a full import that then stays in sync.</p>
+          </div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">03</div>
+          <div>
+            <h3>Watch it work, or leave and come back</h3>
+            <p>Folders and URLs parse immediately into a raw library while enrichment runs in the background — parsed, fetched, classified, summarized, failed — all visible, none blocking.</p>
+          </div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">04</div>
+          <div>
+            <h3>Search, filter, and triage</h3>
+            <p>Topic groups, searchable items, filters, and a Suggested review queue. Mark Keep, Read later, or Delete candidate — nothing changes in Chrome itself.</p>
+          </div>
+        </div>
+        <div class="journey-step">
+          <div class="journey-num">05</div>
+          <div>
+            <h3>Export what you decided to keep</h3>
+            <p>Download the full enriched library as CSV/XLSX, or an HTML bookmarks file of the items marked Keep or Read later.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNTS & SYNC -->
+  <section id="sync" class="alt-bg">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Accounts &amp; sync</div>
+        <h2>Two honest ways in — no third route</h2>
+        <p>Sign in with Google (OAuth 2.0 / OpenID Connect) uses only <code>openid</code>, <code>email</code> and <code>profile</code> scopes — identity, nothing else. Bookmarks themselves arrive through exactly one of two routes.</p>
+      </div>
+
+      <div class="route-grid">
+        <div class="route-card">
+          <div class="route-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          </div>
+          <span class="route-badge now">Available today</span>
+          <h3>HTML export upload</h3>
+          <p>Export from Chrome's bookmark manager and upload the file. The always-available path — the only one needed at MVP.</p>
+          <ul class="route-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Re-uploads merge by canonical URL — cheap and expected</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Every prior triage decision and edit is preserved</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> A diff summary shows what's added, changed, or gone</li>
+          </ul>
+        </div>
+        <div class="route-card">
+          <div class="route-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 0v20M2 12h20"/></svg>
+          </div>
+          <span class="route-badge next">Fast follow</span>
+          <h3>Companion Chrome extension</h3>
+          <p>Reads your bookmark tree locally via <code>chrome.bookmarks</code> and pushes deltas as you add, edit or remove — the ongoing-sync mechanism.</p>
+          <ul class="route-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Requests only the <code>bookmarks</code> permission — no history, no tabs, no page content</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Strictly read-only against Chrome — nothing is edited or deleted in your browser</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Converges with HTML re-imports on the same canonical records</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <div class="callout">
+          <h4>What Google sign-in cannot do</h4>
+          <p>Google offers no API for a website or third party to read Chrome-synced bookmarks from a Google account — Chrome Sync is first-party only, and Google has stated it won't whitelist third-party token access. The old Google Bookmarks service also shut down on 30 September 2021. So this product never promises "sign in and your Chrome bookmarks appear." Bookmarks arrive only via an HTML export upload or the companion extension, read locally with your consent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="container">
+      <div class="section-head center">
+        <div class="eyebrow" style="justify-content:center">Inside the library</div>
+        <h2>Built for triage, not for browsing</h2>
+        <p>Every surface is designed around one question: keep, read later, or delete — with an explanation, never a silent guess.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <h3>Search, filter, sort</h3>
+          <p>Normalized title, domain, URL, folder path, topic and summary — multi-select filters combine with AND across dimensions, OR within one.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+          <h3>Topic clusters</h3>
+          <p>Named from actual bookmark content, not folder names. Rename, merge, or move items later — "Unclassified" is a valid topic, not a failure.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h3>Explainable freshness</h3>
+          <p>"Likely old news," "Review for relevance," "Evergreen/unknown," or "Recent" — each with a reason and a confidence, never a guess dressed as fact.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>Reversible triage</h3>
+          <p>Unreviewed, Keep, Read later, or Delete candidate. Every change saves immediately and undoes just as easily — nothing touches Chrome.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg></div>
+          <h3>Content types that mean something</h3>
+          <p>Article, Document/PDF, Long podcast, Video, or Other/Unknown — classified from MIME, structured data and URL signals.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
+          <h3>Export what matters</h3>
+          <p>CSV/XLSX of the full enriched library, or an HTML bookmarks file of the items you chose to keep or read later.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="alt-bg">
+    <div class="container">
+      <div class="section-head center">
+        <div class="eyebrow" style="justify-content:center">Privacy &amp; safety</div>
+        <h2>Private by default</h2>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>Account-scoped, encrypted</h3>
+          <p>HTTPS in transit, encrypted storage, and server-side isolation of processing workers. Bookmark URLs never appear in analytics or error logs.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Nothing shared by default</h3>
+          <p>No search-engine indexing of private libraries, no share links unless you opt in — and any future sharing is scoped and previewed first.</p>
+        </div>
+        <div class="problem-card">
+          <h3>A clear disclosure, every time</h3>
+          <p>Before upload, you see exactly what happens: links may be visited by the service and their content sent to the selected AI processor. Delete an import, or your account, whenever you choose.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-head center">
+        <div class="eyebrow" style="justify-content:center">Growth &amp; monetization</div>
+        <h2>A pricing hypothesis, not a commitment</h2>
+        <p>Proposed tiers to validate in an alpha before any billing is built.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-name">Free</div>
+          <div class="price-amount">$0</div>
+          <div class="price-desc">A small import to try the loop, with limits stated before upload.</div>
+          <ul class="price-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Limited bookmark import</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Basic search &amp; triage</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Topic grouping</li>
+          </ul>
+          <a href="demo.html" class="btn btn-ghost btn-block">Try the demo</a>
+        </div>
+        <div class="price-card featured">
+          <span class="tag">Proposed first</span>
+          <div class="price-name">One-time cleanup</div>
+          <div class="price-amount">Priced <span>by size</span></div>
+          <div class="price-desc">Larger import, full enrichment and exports — priced to processing cost and cleanup value.</div>
+          <ul class="price-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Full-size import, unlimited enrichment</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> CSV/XLSX + HTML export</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Suggested review queue</li>
+          </ul>
+          <a href="demo.html" class="btn btn-accent btn-block">Try the demo</a>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Subscription</div>
+          <div class="price-amount">Later</div>
+          <div class="price-desc">Only if incremental sync, weekly review, and lasting discovery prove recurring usage.</div>
+          <ul class="price-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Companion extension, live sync</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Weekly review prompts</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Team tier, requires sharing controls</li>
+          </ul>
+          <button class="btn btn-ghost btn-block" disabled>Not yet available</button>
+        </div>
+      </div>
+      <p class="price-hypothesis">Unit economics — fetch success rate, cost per enriched URL, storage per library — are still being instrumented. Nothing here is a published price.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="alt-bg">
+    <div class="container-narrow">
+      <div class="section-head">
+        <div class="eyebrow">FAQ</div>
+        <h2>Straight answers, including the limits</h2>
+      </div>
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-q">
+            Will this delete my Chrome bookmarks?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No. A "Delete candidate" is a status inside your library view, not an action in Chrome. In MVP, the companion extension is strictly read-only against Chrome and never edits, moves or deletes your browser bookmarks. Write-back to Chrome is explicitly out of scope until it ships as its own, separately confirmed feature.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q">
+            Does signing in with Google import my synced Chrome bookmarks automatically?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No, and this is deliberate. Google provides no API for a third party to read Chrome-synced bookmarks from an account — Chrome Sync is first-party only, and Google has marked third-party token access as something it won't support. Bookmarks arrive only through an HTML export you upload, or the companion Chrome extension reading your local browser tree with your consent.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q">
+            What happens to my content during processing?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">You see an explicit disclosure before upload: links may be visited by the service and their content sent to the selected AI processor for summarization and classification. Login-only content is never fetched with your cookies, and private or local-network addresses are never crawled.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q">
+            Can I re-import an updated export without losing my triage decisions?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Re-uploads merge by canonical URL, add anything new, and preserve every prior Keep/Read later/Delete-candidate decision, topic edit, and summary override. You get a diff summary of what was added, changed, or is now gone from the export.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q">
+            Is this a social bookmarking or sharing tool?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No — it's a private library and triage tool first. Any future sharing is opt-in and scoped to a curated collection you explicitly select; source folders, private annotations and unselected URLs are never exposed.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q">
+            Is this a working product today?
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">This site presents Generation 2 of the product spec — a build-ready plan, not a shipped product. The interactive demo uses a mock library so you can evaluate the intended experience; sign-in, real imports, and processing are not yet live.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="container">
+      <div class="cta-band">
+        <h2>See it before you import anything real</h2>
+        <p>Explore a mock library of 24 bookmarks with the full search, filter and triage flow — no account, no upload, nothing sent anywhere.</p>
+        <div class="hero-ctas">
+          <a href="demo.html" class="btn btn-accent">Try the demo library</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="brand" style="margin-bottom:14px;">
+          <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4V3z" fill="#e3bd7d"/></svg></span>
+          Bookmark Library
+        </a>
+        <p>A private bookmark library and triage tool. Specification stage — Generation 2, 27 September 2026.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#product">Why it exists</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#sync">Accounts &amp; sync</a></li>
+          <li><a href="demo.html">Demo library</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Details</h4>
+        <ul>
+          <li><a href="#pricing">Pricing hypothesis</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Status</h4>
+        <ul>
+          <li><a href="#faq">Not a shipped product</a></li>
+          <li><a href="#sync">What Google sign-in can't do</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Bookmark Library — build brief demo site.</span>
+      <span>Version: Generation 2 (adds Accounts &amp; sync)</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
