@@ -11,7 +11,7 @@
 <body>
 
 <div class="spec-banner">
-  <strong>Specification stage</strong> — this site demos the product spec (Gen 2). Thresholds, pricing and the Google-sync flow below are hypotheses to validate, not commitments. <a href="#faq">Read the honesty notes</a>.
+  <strong>Free &amp; real</strong> — the import, search, filter and triage below actually work, run entirely in your browser, and cost nothing. AI summaries, content-based freshness and Chrome-extension sync are future work, not built yet. <a href="#faq">Read the honesty notes</a>.
 </div>
 
 <header class="nav">
@@ -30,7 +30,7 @@
       <a href="#faq">FAQ</a>
     </nav>
     <div class="nav-cta">
-      <a href="demo.html" class="btn btn-primary btn-sm">Try the demo</a>
+      <a href="app.html" class="btn btn-primary btn-sm">Open your library</a>
     </div>
     <button class="nav-toggle" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -52,12 +52,12 @@
           then helps you decide, item by item, what to keep, read later, or let go.
         </p>
         <div class="hero-ctas">
-          <a href="demo.html" class="btn btn-accent">Try the demo library</a>
+          <a href="app.html" class="btn btn-accent">Import your bookmarks — free</a>
           <a href="#how-it-works" class="btn btn-ghost">See how it works</a>
         </div>
         <div class="hero-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-          Private by default — nothing is deleted from Chrome, and nothing is shared unless you choose to.
+          Free, no account required, and nothing you import ever leaves your browser.
         </div>
       </div>
 
@@ -70,10 +70,10 @@
           <div class="mock-body">
             <div class="mock-searchbar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              Search 2,412 bookmarks…
+              Search your bookmarks…
             </div>
             <div class="mock-chip-row">
-              <span class="mock-chip">AI agents · 84</span>
+              <span class="mock-chip">Research/Papers</span>
               <span class="mock-chip alt">Article</span>
               <span class="mock-chip alt">Unreviewed</span>
             </div>
@@ -83,27 +83,27 @@
               <div class="mock-item-body">
                 <div class="mock-item-title">Context windows and the case for cheap memory</div>
                 <div class="mock-item-meta">arxiv.org · Research/Papers/2025 · Article</div>
-                <div class="mock-item-summary">Argues that retrieval cost, not context length, is the binding constraint.</div>
+                <div class="mock-item-summary">No summary — this free build doesn't fetch page content.</div>
               </div>
-              <span class="mock-tag fresh">Recent</span>
+              <span class="mock-tag fresh">Saved this month</span>
             </div>
             <div class="mock-item">
               <div class="mock-favicon" style="background:#3a5f7a;">P</div>
               <div class="mock-item-body">
                 <div class="mock-item-title">Series A pricing trends, Q1 2024 review</div>
                 <div class="mock-item-meta">substack.com · New folder (3)/Reading · Article</div>
-                <div class="mock-item-summary">Quarterly pricing data now two years stale — figures likely superseded.</div>
+                <div class="mock-item-summary">No summary — this free build doesn't fetch page content.</div>
               </div>
-              <span class="mock-tag old">Likely old news</span>
+              <span class="mock-tag old">Saved 2+ years ago</span>
             </div>
             <div class="mock-item">
               <div class="mock-favicon" style="background:#6b6558;">D</div>
               <div class="mock-item-body">
                 <div class="mock-item-title">docs — cluster autoscaling reference</div>
                 <div class="mock-item-meta">internal-wiki.dev · Docs · Document/PDF</div>
-                <div class="mock-item-summary">Could not verify freshness — no publication date detected.</div>
+                <div class="mock-item-summary">No summary — this free build doesn't fetch page content.</div>
               </div>
-              <span class="mock-tag unknown">Evergreen/unknown</span>
+              <span class="mock-tag unknown">Save date unknown</span>
             </div>
           </div>
         </div>
@@ -154,7 +154,7 @@
           <div class="journey-num">01</div>
           <div>
             <h3>See the output before you sign up</h3>
-            <p>The landing page explains the output and privacy in one screen. Try a small demo library before creating an account.</p>
+            <p>The landing page explains the output and privacy in one screen. No account is required to start — Guest mode works immediately.</p>
           </div>
         </div>
         <div class="journey-step">
@@ -307,47 +307,45 @@
   <section id="pricing">
     <div class="container">
       <div class="section-head center">
-        <div class="eyebrow" style="justify-content:center">Growth &amp; monetization</div>
-        <h2>A pricing hypothesis, not a commitment</h2>
-        <p>Proposed tiers to validate in an alpha before any billing is built.</p>
+        <div class="eyebrow" style="justify-content:center">Pricing</div>
+        <h2>Free. No tiers, no catch.</h2>
+        <p>This build has no server and no AI processing bill, so there's nothing to charge for. Everything below the free tier is unbuilt speculation from the original spec, not a locked feature.</p>
       </div>
       <div class="pricing-grid">
-        <div class="price-card">
-          <div class="price-name">Free</div>
-          <div class="price-amount">$0</div>
-          <div class="price-desc">A small import to try the loop, with limits stated before upload.</div>
-          <ul class="price-list">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Limited bookmark import</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Basic search &amp; triage</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Topic grouping</li>
-          </ul>
-          <a href="demo.html" class="btn btn-ghost btn-block">Try the demo</a>
-        </div>
         <div class="price-card featured">
-          <span class="tag">Proposed first</span>
-          <div class="price-name">One-time cleanup</div>
-          <div class="price-amount">Priced <span>by size</span></div>
-          <div class="price-desc">Larger import, full enrichment and exports — priced to processing cost and cleanup value.</div>
+          <span class="tag">What's live</span>
+          <div class="price-name">Free — forever</div>
+          <div class="price-amount">$0</div>
+          <div class="price-desc">Runs entirely in your browser. No import limits, no account required.</div>
           <ul class="price-list">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Full-size import, unlimited enrichment</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> CSV/XLSX + HTML export</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Suggested review queue</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Unlimited bookmark import</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Search, filter, triage &amp; export</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Optional Google Sign-In, or Guest mode</li>
           </ul>
-          <a href="demo.html" class="btn btn-accent btn-block">Try the demo</a>
+          <a href="app.html" class="btn btn-accent btn-block">Open your library</a>
         </div>
         <div class="price-card">
-          <div class="price-name">Subscription</div>
-          <div class="price-amount">Later</div>
-          <div class="price-desc">Only if incremental sync, weekly review, and lasting discovery prove recurring usage.</div>
+          <div class="price-name">AI enrichment</div>
+          <div class="price-amount">Not built</div>
+          <div class="price-desc">Real summaries and content-based freshness need a paid backend to fetch pages and call an AI model. Skipped to keep this free.</div>
           <ul class="price-list">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Companion extension, live sync</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Weekly review prompts</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Team tier, requires sharing controls</li>
+            <li>Would require server-side fetching</li>
+            <li>Would require a paid AI API</li>
+          </ul>
+          <button class="btn btn-ghost btn-block" disabled>Not planned unless requested</button>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Chrome extension sync</div>
+          <div class="price-amount">Not built</div>
+          <div class="price-desc">Live sync from a browser extension is still just the spec below — the free app today only reads a one-time HTML export.</div>
+          <ul class="price-list">
+            <li>Designed in the spec (see Accounts &amp; sync)</li>
+            <li>Would need its own Chrome Web Store listing</li>
           </ul>
           <button class="btn btn-ghost btn-block" disabled>Not yet available</button>
         </div>
       </div>
-      <p class="price-hypothesis">Unit economics — fetch success rate, cost per enriched URL, storage per library — are still being instrumented. Nothing here is a published price.</p>
+      <p class="price-hypothesis">Your imported bookmarks live only in this browser's local storage — nothing is uploaded, so there's no per-user hosting cost to recover.</p>
     </div>
   </section>
 
@@ -405,7 +403,7 @@
             Is this a working product today?
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           </button>
-          <div class="faq-a"><div class="faq-a-inner">This site presents Generation 2 of the product spec — a build-ready plan, not a shipped product. The interactive demo uses a mock library so you can evaluate the intended experience; sign-in, real imports, and processing are not yet live.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">The core loop is real and free: upload your actual Chrome bookmarks export, and it's parsed, stored and made searchable/filterable/triage-able entirely in your browser (Guest mode or optional Google Sign-In). What's <em>not</em> built from the original spec: AI-generated summaries, content-based freshness (we only know your <em>saved</em> date, not whether the page itself is stale), automatic broken-link detection, and the companion Chrome extension for live sync. Those all need a paid backend to fetch and analyze pages, which this free version deliberately skips.</div></div>
         </div>
 
       </div>
@@ -416,10 +414,10 @@
   <section>
     <div class="container">
       <div class="cta-band">
-        <h2>See it before you import anything real</h2>
-        <p>Explore a mock library of 24 bookmarks with the full search, filter and triage flow — no account, no upload, nothing sent anywhere.</p>
+        <h2>Bring your real bookmarks in — it's free</h2>
+        <p>Export from Chrome, drop the file in, and get an actual searchable, triage-able library. No account, no upload to any server, nothing sent anywhere.</p>
         <div class="hero-ctas">
-          <a href="demo.html" class="btn btn-accent">Try the demo library</a>
+          <a href="app.html" class="btn btn-accent">Import your bookmarks</a>
         </div>
       </div>
     </div>
@@ -443,7 +441,7 @@
           <li><a href="#product">Why it exists</a></li>
           <li><a href="#how-it-works">How it works</a></li>
           <li><a href="#sync">Accounts &amp; sync</a></li>
-          <li><a href="demo.html">Demo library</a></li>
+          <li><a href="app.html">Open the app</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -462,8 +460,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Bookmark Library — build brief demo site.</span>
-      <span>Version: Generation 2 (adds Accounts &amp; sync)</span>
+      <span>© 2026 Bookmark Library — free &amp; open source.</span>
+      <span><a href="https://github.com/pratikpoddar/bookmark-library" style="color:inherit;">View source on GitHub</a></span>
     </div>
   </div>
 </footer>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your library — Bookmark Library</title>
+<meta name="description" content="Upload your Chrome bookmarks export and get a real, private, searchable library — free, runs entirely in your browser." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231c1a17%22/><path d=%22M10 8h12v17l-6-4-6 4V8z%22 fill=%22%23e3bd7d%22/></svg>" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/app.css" />
+<script src="js/config.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="app">
+
+<!-- SIGN-IN GATE -->
+<div class="gate-wrap" id="gateWrap">
+  <div class="gate-box">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4V3z" fill="#e3bd7d"/></svg></span>
+    <h1>Bookmark Library</h1>
+    <p>Free, and it runs entirely on this device. Sign in to keep a separate library per Google account on this browser, or just continue as a guest.</p>
+
+    <div id="googleBtn"></div>
+    <div class="gate-not-configured" id="googleNotConfigured">
+      Google Sign-In isn't set up on this deployment yet.
+      <button id="openSettingsFromGate">Add a Google Client ID (free, ~2 min) →</button>
+    </div>
+
+    <div class="gate-or">or</div>
+    <button class="btn btn-primary btn-block" id="guestBtn">Continue as Guest</button>
+
+    <div class="gate-privacy">
+      Nothing you import ever leaves this browser — no server, no account required, no cost. Data lives in this browser's local storage, scoped to whichever profile you pick here.
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL (hidden until signed in) -->
+<div id="appShell" style="display:none;">
+
+  <header class="app-bar">
+    <div class="app-bar-inner">
+      <a href="index.html" class="app-brand">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4V3z" fill="#e3bd7d"/></svg></span>
+        <span class="name">Bookmark Library</span>
+      </a>
+      <span class="free-pill">Free · local-only</span>
+
+      <div class="app-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Search title, domain, URL or folder…" autocomplete="off" />
+        <span class="query-count" id="queryCount"></span>
+      </div>
+
+      <div class="app-bar-actions">
+        <button class="icon-btn" id="importBtn" title="Import or re-import a bookmarks export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          Import
+        </button>
+        <button class="icon-btn" id="suggestedToggle" title="Unreviewed + stale or reported-broken items">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          Suggested
+        </button>
+        <button class="icon-btn" id="exportMenuBtn" title="Export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          Export
+        </button>
+        <div class="owner-menu-wrap">
+          <div class="owner-chip" id="ownerChip">
+            <span class="owner-avatar" id="ownerAvatar">G</span>
+            <span id="ownerName">Guest</span>
+          </div>
+          <div class="owner-dropdown" id="ownerDropdown">
+            <button id="menuSettings">Google Sign-In settings…</button>
+            <button id="menuClearLibrary">Clear this library…</button>
+            <hr />
+            <button class="danger-text" id="menuSignOut">Switch account / Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <input type="file" id="fileInput" accept=".html,.htm" style="display:none;" />
+
+  <div class="app-layout">
+
+    <aside class="app-rail" id="appRail" style="display:none;">
+      <button class="btn btn-accent btn-sm rail-import-btn" id="railImportBtn">Import bookmarks</button>
+      <div class="rail-section" style="margin-top:18px;">
+        <div class="rail-title">Review status</div>
+        <div id="railStatus"></div>
+      </div>
+      <div class="rail-section">
+        <div class="rail-title">Folder</div>
+        <div id="railFolder"></div>
+      </div>
+      <div class="rail-section">
+        <div class="rail-title">Content type</div>
+        <div id="railType"></div>
+      </div>
+      <div class="rail-section">
+        <div class="rail-title">Saved</div>
+        <div id="railFreshness"></div>
+      </div>
+      <div class="rail-section">
+        <div class="rail-title">Latest import</div>
+        <div id="railPresence"></div>
+      </div>
+      <button class="rail-clear-all" id="clearAllFilters">Reset all filters</button>
+    </aside>
+
+    <main class="app-main">
+
+      <!-- Onboarding: shown when the library is empty -->
+      <div class="onboard-panel" id="onboardPanel" style="display:none;">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        </div>
+        <h2>Import your bookmarks to get started</h2>
+        <p>Drop your Chrome bookmarks export here, or click to choose the file. Everything is parsed and stored on this device only.</p>
+        <button class="btn btn-primary" id="onboardUploadBtn">Choose file…</button>
+        <ol class="onboard-steps">
+          <li>1. In Chrome, open <strong>chrome://bookmarks</strong></li>
+          <li>2. Click the ⋮ menu → <strong>Export bookmarks</strong></li>
+          <li>3. Drop the downloaded .html file here</li>
+        </ol>
+      </div>
+
+      <div id="libraryView" style="display:none;">
+        <div class="stats-strip" id="statsStrip"></div>
+        <div class="status-bar" id="statusBar"></div>
+        <div class="status-legend" id="statusLegend"></div>
+
+        <div class="suggested-banner" id="suggestedBanner" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+          <div>
+            <strong>Suggested review</strong>
+            Unreviewed items you saved 2+ years ago, or that you've reported broken. Nothing here is touched automatically.
+          </div>
+          <button id="suggestedClose">Exit suggested view</button>
+        </div>
+
+        <div class="bulk-bar" id="bulkBar">
+          <span class="count"><span id="bulkCount">0</span> selected</span>
+          <div class="spacer"></div>
+          <button data-bulk="keep">Mark Keep</button>
+          <button data-bulk="read-later">Mark Read later</button>
+          <button class="danger" data-bulk="delete-candidate">Mark Delete candidate</button>
+          <button class="clear" id="bulkClear">Clear selection</button>
+        </div>
+
+        <div class="results-head">
+          <label class="rail-option" style="padding:0; gap:8px;">
+            <input type="checkbox" id="selectAll" />
+          </label>
+          <div class="results-count"><strong id="countShown">0</strong> of <span id="countTotal">0</span> bookmarks</div>
+          <div class="active-filter-chips" id="activeChips"></div>
+          <select class="sort-select" id="sortSelect">
+            <option value="saved-desc">Sort: Saved date (newest)</option>
+            <option value="saved-asc">Sort: Saved date (oldest)</option>
+            <option value="title-asc">Sort: Title (A–Z)</option>
+            <option value="domain-asc">Sort: Domain (A–Z)</option>
+          </select>
+        </div>
+
+        <div class="item-list" id="itemList"></div>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <h3>No bookmarks match these filters</h3>
+          <p>Try clearing a filter or your search query.</p>
+          <button class="btn btn-ghost" id="emptyReset">Clear all filters</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Import summary modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal-box">
+    <button class="modal-close-x" id="importModalClose">&times;</button>
+    <h3 id="importModalTitle">Import complete</h3>
+    <p id="importModalBody"></p>
+    <button class="btn btn-primary btn-block" id="importModalOk">Got it</button>
+  </div>
+</div>
+
+<!-- Google Sign-In settings modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <button class="modal-close-x" id="settingsModalClose">&times;</button>
+    <h3>Enable Google Sign-In</h3>
+    <p>Optional — everything works today in Guest mode. This just lets you keep separate libraries per Google account, on this device.</p>
+    <ol>
+      <li>Go to <strong>console.cloud.google.com</strong> → create a free project</li>
+      <li><strong>APIs &amp; Services → Credentials → Create OAuth client ID</strong> (type: Web application)</li>
+      <li>Add this site's URL under <strong>Authorized JavaScript origins</strong></li>
+      <li>Paste the generated Client ID below</li>
+    </ol>
+    <input type="text" id="clientIdInput" placeholder="xxxxxxxx.apps.googleusercontent.com" />
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="clearClientId">Remove</button>
+      <button class="btn btn-primary" id="saveClientId">Save &amp; reload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export menu modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-box">
+    <button class="modal-close-x" id="exportModalClose">&times;</button>
+    <h3>Export</h3>
+    <p>Exports respect your current search and filters.</p>
+    <div class="modal-actions" style="flex-direction:column;">
+      <button class="btn btn-primary btn-block" id="exportCsvBtn" style="margin-bottom:10px;">Export CSV (full detail)</button>
+      <button class="btn btn-ghost btn-block" id="exportHtmlBtn">Export HTML bookmarks file (Keep + Read later)</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="js/idb.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
