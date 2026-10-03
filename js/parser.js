@@ -126,6 +126,17 @@ function domainOf(url) {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
 }
 
+const CHROME_ROOT_FOLDERS = new Set(['bookmarks bar', 'other bookmarks', 'mobile bookmarks', 'bookmarks']);
+
+// Chrome always nests real bookmarks under a root container ("Bookmarks
+// bar", "Other bookmarks", …) — that root is nearly always the same for
+// every bookmark, so it's useless as a filter. Skip past it to the first
+// folder the person actually created.
 function topFolder(folder) {
-  return folder.split('/')[0] || 'Uncategorized';
+  const segments = folder.split('/').filter(Boolean);
+  if (segments.length === 0) return 'Uncategorized';
+  if (segments.length > 1 && CHROME_ROOT_FOLDERS.has(segments[0].toLowerCase())) {
+    return segments[1];
+  }
+  return segments[0];
 }

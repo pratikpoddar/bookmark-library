@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4173"],
       "port": 4173
+    },
+    {
+      "name": "readsmart-netlify-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "netlify-cli", "dev", "--port", "8888"],
+      "port": 8888
     }
   ]
 }

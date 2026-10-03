@@ -6,7 +6,9 @@
 
 let currentAccount = null;
 let bookmarks = [];
-let filters = { status: new Set(), folder: new Set(), type: new Set(), freshness: new Set(), presence: new Set() };
+let filters = { status: new Set(), folder: new Set(), type: new Set(), freshness: new Set(), presence: new Set(), topic: new Set() };
+let analysisCancelled = false;
+let analysisRunning = false;
 let searchQuery = '';
 let sortKey = 'saved-desc';
 let selection = new Set();
@@ -20,6 +22,7 @@ const FAVICON_COLORS = ['#a8721f', '#3a5f7a', '#3f7a5c', '#8a5c63', '#5c5a8a', '
 
 const FACETS = [
   { key: 'status', railId: 'railStatus', getValue: (it) => it.status, labels: STATUS_LABELS, order: ['unreviewed', 'keep', 'read-later', 'delete-candidate'] },
+  { key: 'topic', railId: 'railTopic', getValue: (it) => it.topicCluster || 'Not analyzed yet', pinLast: ['Unclustered', 'Not analyzed yet'] },
   { key: 'folder', railId: 'railFolder', getValue: (it) => topFolder(it.folder) },
   { key: 'type', railId: 'railType', getValue: (it) => guessContentType(it.url), order: ['Article', 'Document/PDF', 'Podcast', 'Video'] },
   { key: 'freshness', railId: 'railFreshness', getValue: (it) => guessFreshness(it.savedAt).bucket, labels: FRESHNESS_LABELS, order: ['new', 'this-year', 'last-year', 'old', 'unknown'] },
@@ -146,6 +149,98 @@ async function toggleBroken(id) {
 }
 
 // ---------------------------------------------------------------------------
+// Content fetch + local clustering (free: one serverless function per page,
+// no AI). Opt-in, cancelable, resumable — already-fetched pages are skipped
+// on a re-run.
+// ---------------------------------------------------------------------------
+async function analyzeContent() {
+  if (analysisRunning) return;
+  const candidates = bookmarks.filter(b => b.fetchStatus !== 'ok');
+  if (candidates.length === 0) {
+    showToast('Every bookmark already has fetched content — import more to analyze them too.');
+    return;
+  }
+  analysisRunning = true;
+  analysisCancelled = false;
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('analyzeProgress').style.display = 'block';
+  const total = candidates.length;
+  let done = 0;
+  updateAnalyzeProgress(done, total);
+
+  const CONCURRENCY = 8;
+  let idx = 0;
+  async function worker() {
+    while (idx < candidates.length && !analysisCancelled) {
+      const b = candidates[idx++];
+      await fetchOnePage(b);
+      done++;
+      updateAnalyzeProgress(done, total);
+    }
+  }
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+
+  document.getElementById('analyzeProgress').style.display = 'none';
+  document.getElementById('analyzeBtn').disabled = false;
+  analysisRunning = false;
+
+  await runClustering();
+  renderAll();
+  const okCount = bookmarks.filter(b => b.fetchStatus === 'ok').length;
+  const failCount = bookmarks.filter(b => b.fetchStatus === 'failed').length;
+  showToast(analysisCancelled
+    ? `Stopped — checked ${done} of ${total} (${okCount} fetched so far, ${failCount} failed). Topics updated with what's in.`
+    : `Fetched ${okCount} of ${total} pages (${failCount} couldn't be reached). Topics updated.`);
+}
+
+async function fetchOnePage(b) {
+  try {
+    const res = await fetch(`/api/fetch-page?url=${encodeURIComponent(b.url)}`);
+    const data = await res.json();
+    if (data.ok) {
+      b.fetchStatus = 'ok';
+      b.fetchedTitle = data.title || '';
+      b.fetchedDescription = data.description || '';
+      b.fetchedText = data.text || '';
+      b.fetchFailReason = null;
+    } else {
+      b.fetchStatus = 'failed';
+      b.fetchFailReason = data.reason || 'unknown';
+    }
+  } catch (e) {
+    b.fetchStatus = 'failed';
+    b.fetchFailReason = 'network_error';
+  }
+  b.fetchedAt = Date.now();
+  await idbPut(b);
+}
+
+function updateAnalyzeProgress(done, total) {
+  document.getElementById('analyzeProgressText').textContent = `Fetching page text… ${done} / ${total}`;
+  document.getElementById('analyzeProgressFill').style.width = `${total ? (done / total * 100) : 0}%`;
+}
+
+async function runClustering() {
+  const docs = bookmarks.map(b => {
+    // A static HTML fetch of a video/podcast page is mostly player chrome,
+    // not the actual content — trust only the title for those.
+    const type = guessContentType(b.url);
+    const fullTextOk = type !== 'Video' && type !== 'Podcast';
+    const text = fullTextOk
+      ? [b.fetchedTitle, b.fetchedDescription, b.fetchedText].filter(Boolean).join(' ') || b.title
+      : b.title;
+    return { id: b.id, text };
+  });
+  const labels = clusterDocuments(docs, { threshold: 0.12, minClusterSize: 3 });
+  const toWrite = [];
+  bookmarks.forEach(b => {
+    const label = labels.get(b.id) || 'Unclustered';
+    if (b.topicCluster !== label) { b.topicCluster = label; toWrite.push(b); }
+  });
+  if (toWrite.length) await idbBulkPut(toWrite);
+}
+
+// ---------------------------------------------------------------------------
 // Facets / filtering
 // ---------------------------------------------------------------------------
 function matchesSearch(it) {
@@ -206,6 +301,9 @@ function renderRail() {
       values = facet.order.filter(v => values.includes(v)).concat(values.filter(v => !facet.order.includes(v)));
     } else {
       values.sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0) || String(a).localeCompare(String(b)));
+    }
+    if (facet.pinLast) {
+      values = values.filter(v => !facet.pinLast.includes(v)).concat(facet.pinLast.filter(v => values.includes(v)));
     }
     container.innerHTML = values.map(v => {
       const count = counts.get(v) || 0;
@@ -302,6 +400,18 @@ function faviconColor(domain) {
   for (let i = 0; i < domain.length; i++) h = (h * 31 + domain.charCodeAt(i)) >>> 0;
   return FAVICON_COLORS[h % FAVICON_COLORS.length];
 }
+const FETCH_FAIL_REASONS = {
+  invalid_or_blocked_url: 'blocked for safety', http_error: 'page returned an error', not_html: 'not an HTML page',
+  too_large: 'page too large', timeout: 'timed out', network_error: 'network error', unknown: 'unknown error'
+};
+function humanizeFetchFail(reason) { return FETCH_FAIL_REASONS[reason] || 'could not fetch'; }
+
+function summaryLine(it) {
+  if (it.fetchStatus === 'ok') return it.fetchedDescription || 'Content fetched for clustering — no description found on the page.';
+  if (it.fetchStatus === 'failed') return `Could not fetch this page (${humanizeFetchFail(it.fetchFailReason)}) — clustering falls back to the title only.`;
+  return 'No summary — click "Cluster" to fetch page text for topic grouping (free, no AI).';
+}
+
 function formatDate(ms) {
   if (!ms) return null;
   return new Date(ms).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -315,9 +425,11 @@ function renderItem(it) {
   const savedLabel = formatDate(it.savedAt) || 'Save date unknown';
 
   const tags = [`<span class="tag folder-tag">${escapeHtml(it.folder)}</span>`];
+  if (it.topicCluster && it.topicCluster !== 'Unclustered') tags.push(`<span class="tag topic-tag">${escapeHtml(it.topicCluster)}</span>`);
   tags.push(`<span class="tag ${fresh.bucket}">${escapeHtml(fresh.label)}</span>`);
   if (!it.presentInLatestImport) tags.push(`<span class="tag not-latest">Not in latest import</span>`);
   if (it.manualBroken) tags.push(`<span class="tag broken">Reported broken</span>`);
+  if (it.fetchStatus === 'failed') tags.push(`<span class="tag broken" title="${escapeAttr(humanizeFetchFail(it.fetchFailReason))}">Content not fetched</span>`);
 
   return `
   <div class="item-card ${selected ? 'selected' : ''}" data-id="${it.id}">
@@ -333,7 +445,7 @@ function renderItem(it) {
         <span class="folder-path">${escapeHtml(it.folder)}</span><span class="sep">·</span>
         <span>Saved ${savedLabel}</span>
       </div>
-      <div class="item-summary">No summary — this free build doesn't fetch page content.</div>
+      <div class="item-summary">${escapeHtml(summaryLine(it))}</div>
       <div class="badge-row">
         ${tags.join('')}
         <button class="report-broken-btn" data-report="${it.id}">${it.manualBroken ? 'Undo broken report' : 'Report broken link'}</button>
@@ -422,7 +534,7 @@ function showToast(message, opts) {
 function cloneFilters(f) { const out = {}; Object.keys(f).forEach(k => out[k] = new Set(f[k])); return out; }
 function enterSuggested() {
   preSuggestState = { filters: cloneFilters(filters), searchQuery, sortKey };
-  filters = { status: new Set(), folder: new Set(), type: new Set(), freshness: new Set(), presence: new Set() };
+  filters = { status: new Set(), folder: new Set(), type: new Set(), freshness: new Set(), presence: new Set(), topic: new Set() };
   searchQuery = '';
   document.getElementById('searchInput').value = '';
   suggestedMode = true;
@@ -456,9 +568,10 @@ function downloadBlob(content, mime, filename) {
 function exportCsv() {
   const rows = getVisibleItems().map(it => ({
     title: it.title, url: it.url, domain: domainOf(it.url), folder: it.folder,
-    contentType: guessContentType(it.url), saved: guessFreshness(it.savedAt).label,
+    topic: it.topicCluster || '', contentType: guessContentType(it.url), saved: guessFreshness(it.savedAt).label,
     savedDate: it.savedAt ? new Date(it.savedAt).toISOString().slice(0, 10) : '',
     status: it.status, reportedBroken: it.manualBroken ? 'yes' : 'no',
+    contentFetched: it.fetchStatus === 'ok' ? 'yes' : it.fetchStatus === 'failed' ? 'failed' : 'not attempted',
     inLatestImport: it.presentInLatestImport ? 'yes' : 'no'
   }));
   if (rows.length === 0) { showToast('Nothing to export with the current filters.'); return; }
@@ -540,6 +653,9 @@ function wireStaticEvents() {
     renderList();
   });
   document.getElementById('bulkClear').addEventListener('click', () => { selection.clear(); renderList(); });
+
+  document.getElementById('analyzeBtn').addEventListener('click', analyzeContent);
+  document.getElementById('analyzeCancelBtn').addEventListener('click', () => { analysisCancelled = true; });
 
   document.getElementById('suggestedToggle').addEventListener('click', () => { suggestedMode ? exitSuggested() : enterSuggested(); });
   document.getElementById('suggestedClose').addEventListener('click', exitSuggested);

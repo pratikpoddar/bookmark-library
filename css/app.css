@@ -282,6 +282,26 @@ body.app {
   font-family: var(--sans);
 }
 
+.analyze-banner {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--accent-dark);
+}
+.analyze-banner-top { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 13.5px; margin-bottom: 8px; }
+.analyze-banner-top button {
+  margin-left: auto; background: none; border: 1px solid var(--accent-soft-border); color: var(--accent-dark);
+  font-weight: 700; font-size: 12px; cursor: pointer; padding: 4px 10px; border-radius: 6px;
+}
+.analyze-bar { height: 6px; background: #f1e3c4; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.analyze-bar div { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s ease; }
+.analyze-banner p { font-size: 12px; color: var(--accent-dark); opacity: 0.85; margin: 0; }
+
+.tag.topic-tag { background: #eef0fb; color: #4b4f9e; }
+
 .suggested-banner {
   display: flex;
   align-items: center;
